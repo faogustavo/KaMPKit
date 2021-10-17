@@ -16,6 +16,10 @@ buildscript {
     }
 }
 
+plugins {
+    id("kotlinx-kover") version "0.3.0"
+}
+
 allprojects {
     repositories {
         google()
