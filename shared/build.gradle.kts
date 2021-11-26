@@ -14,28 +14,20 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
     lint {
         isWarningsAsErrors = true
         isAbortOnError = true
     }
-}
 
-version = "1.0"
-
-android {
-    compileSdk = libs.versions.compileSdk.get().toInt()
-
-    defaultConfig {
-        minSdk = libs.versions.minSdk.get().toInt()
-        targetSdk = libs.versions.targetSdk.get().toInt()
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-
-    buildTypes {
-        debug {}
+    testOptions {
+        unitTests.all {
+            it.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
+                isEnabled = true
+                binaryReportFile.set(file("$buildDir/kover/${it.name}/report.bin"))
+            }
+        }
     }
 
     packagingOptions {
@@ -47,6 +39,8 @@ android {
         )
     }
 }
+
+version = "1.0"
 
 kotlin {
     android()
@@ -79,8 +73,6 @@ kotlin {
     }
 
     sourceSets["commonTest"].dependencies {
-        implementation(kotlin("test-common"))
-        implementation(kotlin("test-annotations-common"))
         implementation(libs.bundles.shared.commonTest)
     }
 
@@ -94,10 +86,20 @@ kotlin {
         implementation(libs.ktor.client.okHttp)
     }
 
-    sourceSets["androidTest"].dependencies {}
-
     sourceSets["androidAndroidTest"].dependencies {
         implementation(libs.bundles.shared.androidTest)
+    }
+
+    sourceSets.create("commonInstrumentationTest") {
+        dependsOn(sourceSets["commonTest"])
+
+        sourceSets["iosTest"].dependsOn(this)
+        sourceSets["androidAndroidTest"].dependsOn(this)
+
+        dependencies {
+            implementation(kotlin("test-common"))
+            implementation(kotlin("test-annotations-common"))
+        }
     }
 
     sourceSets["iosMain"].dependencies {
