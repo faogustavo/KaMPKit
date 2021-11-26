@@ -1,0 +1,64 @@
+name: Code Coverage
+
+# Cancelling running jobs to reduce CI usage time
+# https://github.community/t/concurrency-cancel-in-progress-at-top-level-doesnt-seem-to-cancel-running-workflows/175801/5
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Gradle Cache
+        uses: actions/cache@v1
+        with:
+          path: |
+            ~/.gradle/caches/
+            ~/.gradle/wrapper/
+            ~/.android/build-cache
+          key: ${{ runner.OS }}-gradle-cache
+
+      - uses: actions/setup-java@v2
+        with:
+          distribution: "adopt"
+          java-version: "11"
+
+      - name: Shared - Build
+        run: ./gradlew clean build -x check
+        ## Excluding the check task to build faster
+
+      - name: Android + Shared - Run Unit Tests # And linter
+        run: ./gradlew check
+
+      - name: Android - Run Instrumented Tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 29
+          script: ./gradlew :androidApp:connectedCheck
+
+      - name: iOS - Run Tests
+        run: |
+          cd iosApp
+          xcodebuild \
+            -workspace iosApp.xcworkspace \
+            -scheme iosApp \
+            -sdk iphonesimulator \
+            -destination 'platform=iOS Simulator,name=iPhone SE (2nd generation),OS=14.4' \
+            build test
+
+      - name: Coverage
+        run: |
+          bash <(curl -s https://codecov.io/bash)
+          bash <(curl -s https://codecov.io/bash) -X xcodellvm
