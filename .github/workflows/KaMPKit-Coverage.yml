@@ -1,4 +1,4 @@
-name: Code Coverage
+name: KaMPKit-Coverage
 
 # Cancelling running jobs to reduce CI usage time
 # https://github.community/t/concurrency-cancel-in-progress-at-top-level-doesnt-seem-to-cancel-running-workflows/175801/5
