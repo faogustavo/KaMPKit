@@ -50,10 +50,10 @@ jobs:
 
       - name: iOS - Run Tests
         run: |
-          cd iosApp
+          cd ios
           xcodebuild \
-            -workspace iosApp.xcworkspace \
-            -scheme iosApp \
+            -workspace KaMPKitiOS.xcworkspace/ \
+            -scheme KaMPKitiOS \
             -sdk iphonesimulator \
             -destination 'platform=iOS Simulator,name=iPhone SE (2nd generation),OS=14.4' \
             build test
