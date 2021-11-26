@@ -23,13 +23,28 @@ android {
 version = "1.0"
 
 android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
+    compileSdk = libs.versions.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.targetSdk.get().toInt()
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
+    buildTypes {
+        debug {}
+    }
+
+    packagingOptions {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LGPL2.1",
+                "META-INF/AL2.0",
+            )
+        )
     }
 }
 
@@ -64,6 +79,8 @@ kotlin {
     }
 
     sourceSets["commonTest"].dependencies {
+        implementation(kotlin("test-common"))
+        implementation(kotlin("test-annotations-common"))
         implementation(libs.bundles.shared.commonTest)
     }
 
@@ -77,7 +94,9 @@ kotlin {
         implementation(libs.ktor.client.okHttp)
     }
 
-    sourceSets["androidTest"].dependencies {
+    sourceSets["androidTest"].dependencies {}
+
+    sourceSets["androidAndroidTest"].dependencies {
         implementation(libs.bundles.shared.androidTest)
     }
 
