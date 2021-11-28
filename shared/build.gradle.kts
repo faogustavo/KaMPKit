@@ -21,12 +21,9 @@ android {
         isAbortOnError = true
     }
 
-    testOptions {
-        unitTests.all {
-            it.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
-                isEnabled = true
-                binaryReportFile.set(file("$buildDir/kover/${it.name}/report.bin"))
-            }
+    buildTypes {
+        debug {
+            isTestCoverageEnabled = true
         }
     }
 

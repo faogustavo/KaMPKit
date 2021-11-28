@@ -19,13 +19,13 @@ android {
     }
 
     buildTypes {
+        debug {
+            isTestCoverageEnabled = true
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
-        // debug {
-        //     isTestCoverageEnabled = true
-        // }
     }
 
     testOptions {

@@ -13,7 +13,6 @@ import kotlin.test.assertTrue
 class SqlDelightTest : BaseTest() {
 
     private lateinit var dbHelper: DatabaseHelper
-    private lateinit var testDbConnection: SqlDriver
 
     private suspend fun DatabaseHelper.insertBreed(name: String) {
         insertBreeds(listOf(Breed(id = 1, name = name, favorite = 0L)))
