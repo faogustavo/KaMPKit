@@ -2,7 +2,6 @@ package co.touchlab.kampkit
 
 import co.touchlab.kampkit.db.Breed
 import co.touchlab.kermit.Logger
-import com.squareup.sqldelight.db.SqlDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlin.test.BeforeTest
