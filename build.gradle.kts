@@ -16,10 +16,53 @@ buildscript {
     }
 }
 
+plugins {
+    id("org.jetbrains.kotlinx.kover") version "0.4.2"
+}
+
+kover {
+    isEnabled = true
+    coverageEngine.set(kotlinx.kover.api.CoverageEngine.JACOCO)
+    jacocoEngineVersion.set("0.8.7")
+    generateReportOnCheck.set(true)
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+    }
+
+    // Android is including the 0.8.3 version of JaCoCo that doesn't work
+    // with kotlin 1.5+ - https://stackoverflow.com/a/69212737/6839227
+    configurations.all {
+        resolutionStrategy {
+            eachDependency {
+                if ("org.jacoco" == requested.group) {
+                    useVersion("0.8.7")
+                }
+            }
+        }
+    }
+
+    afterEvaluate {
+        tasks.withType(Test::class).configureEach {
+            extensions.configure<kotlinx.kover.api.KoverTaskExtension> {
+                isEnabled = true
+                excludes = listOf(".*BuildConfig.*")
+                binaryReportFile.set(file("$buildDir/kover/$name/report.bin"))
+            }
+        }
+
+        tasks.withType<kotlinx.kover.tasks.KoverHtmlReportTask>().configureEach {
+            isEnabled = true
+            htmlReportDir.set(file("$buildDir/kover/${name}/html"))
+        }
+
+        tasks.withType<kotlinx.kover.tasks.KoverXmlReportTask>().configureEach {
+            isEnabled = true
+            xmlReportFile.set(file("$buildDir/kover/${name}/report.xml"))
+        }
     }
 }
 

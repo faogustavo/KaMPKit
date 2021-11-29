@@ -13,15 +13,30 @@ android {
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
+
     packagingOptions {
         resources.excludes.add("META-INF/*.kotlin_module")
     }
+
     buildTypes {
-        getByName("release") {
+        debug {
+            isTestCoverageEnabled = true
+        }
+        release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
+
+    testOptions {
+        unitTests.all {
+            it.extensions.configure(kotlinx.kover.api.KoverTaskExtension::class) {
+                isEnabled = true
+                binaryReportFile.set(file("$buildDir/kover/${it.name}/report.bin"))
+            }
+        }
+    }
+
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
     }

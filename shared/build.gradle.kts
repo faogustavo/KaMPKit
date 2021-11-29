@@ -14,24 +14,30 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+
     lint {
         isWarningsAsErrors = true
         isAbortOnError = true
     }
+
+    buildTypes {
+        debug {
+            isTestCoverageEnabled = true
+        }
+    }
+
+    packagingOptions {
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/LGPL2.1",
+                "META-INF/AL2.0",
+            )
+        )
+    }
 }
 
 version = "1.0"
-
-android {
-    configurations {
-        create("androidTestApi")
-        create("androidTestDebugApi")
-        create("androidTestReleaseApi")
-        create("testApi")
-        create("testDebugApi")
-        create("testReleaseApi")
-    }
-}
 
 kotlin {
     android()
@@ -77,8 +83,20 @@ kotlin {
         implementation(libs.ktor.client.okHttp)
     }
 
-    sourceSets["androidTest"].dependencies {
+    sourceSets["androidAndroidTest"].dependencies {
         implementation(libs.bundles.shared.androidTest)
+    }
+
+    sourceSets.create("commonInstrumentationTest") {
+        dependsOn(sourceSets["commonTest"])
+
+        sourceSets["iosTest"].dependsOn(this)
+        sourceSets["androidAndroidTest"].dependsOn(this)
+
+        dependencies {
+            implementation(kotlin("test-common"))
+            implementation(kotlin("test-annotations-common"))
+        }
     }
 
     sourceSets["iosMain"].dependencies {
