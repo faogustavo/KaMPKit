@@ -35,10 +35,6 @@ jobs:
           distribution: "adopt"
           java-version: "11"
 
-      - name: Shared - Build
-        run: ./gradlew clean build -x check
-        ## Excluding the check task to build faster
-
       - name: Android + Shared - Run Unit Tests # And linter
         run: ./gradlew check
 
